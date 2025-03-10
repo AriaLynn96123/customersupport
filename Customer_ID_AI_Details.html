@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Details - Medibank</title>
+    <title>Medibank Customer Service Portal</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -11,83 +11,729 @@
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Custom styles */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f5f5f7;
-            margin: 0;
-            padding: 20px;
         }
-        .customer-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+        
+        /* MacOS-style window controls */
+        .window-controls span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-top: 16px;
+        
+        .window-close { background-color: #ff5f56; }
+        .window-minimize { background-color: #ffbd2e; }
+        .window-maximize { background-color: #27c93f; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        .info-item {
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        /* Floating card animations */
+        .float-card {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chat message styles */
+        .message {
+            max-width: 80%;
+            margin: 8px;
             padding: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 12px;
         }
-        .info-label {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-bottom: 4px;
+
+        .message-received {
+            background-color: #f0f0f0;
+            align-self: flex-start;
         }
-        .info-value {
-            font-weight: 500;
-            color: #111827;
+
+        .message-sent {
+            background-color: #007AFF;
+            color: white;
+            align-self: flex-end;
         }
     </style>
 </head>
-<body>
-    <div class="customer-card">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold">Customer Profile</h2>
-            <span class="text-sm text-gray-500">ID: #12345678</span>
+<body class="h-screen flex flex-col">
+    <!-- MacOS Status Bar -->
+    <div class="bg-[#1a1a1a] text-white px-4 py-1 flex justify-between items-center text-sm">
+        <div class="flex items-center space-x-4">
+            <i class="fab fa-apple"></i>
+            <span>Medibank Service</span>
+            <span>File</span>
+            <span>Edit</span>
+            <span>View</span>
+            <span>Help</span>
         </div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Full Name</div>
-                <div class="info-value">John Smith</div>
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
+            <span id="clock">12:00 PM</span>
+        </div>
+    </div>
+
+    <!-- App Window -->
+    <div class="flex-1 bg-white shadow-lg m-2 rounded-lg overflow-hidden flex flex-col">
+        <!-- Window Controls -->
+        <div class="bg-[#f5f5f7] px-4 py-2 flex items-center">
+            <div class="window-controls">
+                <span class="window-close"></span>
+                <span class="window-minimize"></span>
+                <span class="window-maximize"></span>
             </div>
-            <div class="info-item">
-                <div class="info-label">Email</div>
-                <div class="info-value">john.smith@example.com</div>
+            <div class="ml-6 text-sm font-medium">Customer Service Portal - Medibank</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex">
+            <!-- Left Sidebar - Navigation -->
+            <div class="w-16 bg-[#f5f5f7] flex flex-col items-center py-4 border-r">
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white mb-4">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="w-10 h-10 hover:bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="w-10 h-10 hover:bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="w-10 h-10 hover:bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
             </div>
-            <div class="info-item">
-                <div class="info-label">Phone</div>
-                <div class="info-value">+61 123 456 789</div>
+
+            <!-- Chat List -->
+            <div class="w-72 border-r">
+                <div class="p-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Search conversations" class="w-full px-4 py-2 bg-[#f5f5f7] rounded-lg pl-10">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="overflow-y-auto h-[calc(100vh-180px)]">
+                    <!-- Chat items -->
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">JD</div>
+                            <div class="ml-3">
+                                <div class="font-medium">John Doe</div>
+                                <div class="text-sm text-gray-500">ID: 12345678</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-500">ES</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Emma Smith</div>
+                                <div class="text-sm text-gray-500">ID: 23456789</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-500">WB</div>
+                            <div class="ml-3">
+                                <div class="font-medium">William Brown</div>
+                                <div class="text-sm text-gray-500">ID: 34567890</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-500">OD</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Olivia Davis</div>
+                                <div class="text-sm text-gray-500">ID: 45678901</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-500">JW</div>
+                            <div class="ml-3">
+                                <div class="font-medium">James Wilson</div>
+                                <div class="text-sm text-gray-500">ID: 56789012</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-500">ST</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Sophia Taylor</div>
+                                <div class="text-sm text-gray-500">ID: 67890123</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500">LM</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Liam Moore</div>
+                                <div class="text-sm text-gray-500">ID: 78901234</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-500">AJ</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Ava Johnson</div>
+                                <div class="text-sm text-gray-500">ID: 89012345</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">NH</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Noah Harris</div>
+                                <div class="text-sm text-gray-500">ID: 90123456</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-500">IA</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Isabella Anderson</div>
+                                <div class="text-sm text-gray-500">ID: 01234567</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="info-item">
-                <div class="info-label">Membership Type</div>
-                <div class="info-value">Premium</div>
+
+            <!-- Chat Window -->
+            <div class="flex-1 flex flex-col">
+                <!-- Chat Header -->
+                <div class="p-4 border-b flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">JD</div>
+                        <div class="ml-3">
+                            <div class="font-medium">John Doe</div>
+                            <button id="customer-id-trigger" class="text-sm text-gray-500 hover:text-blue-500 transition-colors">
+                                ID: 12345678 <i class="fas fa-info-circle ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-phone"></i>
+                        </button>
+                        <button class="p-2 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="p-2 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="flex-1 overflow-y-auto p-4 flex flex-col">
+                    <!-- Messages will be dynamically added here -->
+                    <div class="message message-received">
+                        Hi, I have a question about my insurance coverage for physiotherapy sessions.
+                    </div>
+                    <div class="message message-sent">
+                        Hello! I'll be happy to help you with your physiotherapy coverage inquiry.
+                    </div>
+                    <div class="message message-received">
+                        I've been recommended 10 sessions by my doctor. Are these covered under my plan?
+                    </div>
+                    <div class="message message-sent">
+                        Let me check your coverage details for you.
+                    </div>
+                    <div class="message message-received">
+                        Thank you, I appreciate your help.
+                    </div>
+                    <div class="message message-sent">
+                        Under your Gold membership, you're eligible for up to 12 physiotherapy sessions per year.
+                    </div>
+                    <div class="message message-received">
+                        That's great news! What's the process for claiming?
+                    </div>
+                    <div class="message message-sent">
+                        You can submit your claims through our mobile app or website. Would you like me to guide you through the process?
+                    </div>
+                    <div class="message message-received">
+                        Yes, please. That would be very helpful.
+                    </div>
+                    <div class="message message-sent">
+                        I'll walk you through the steps. First, you'll need to...
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="p-4 border-t">
+                    <div class="flex items-center bg-[#f5f5f7] rounded-lg p-2">
+                        <button class="p-2 hover:bg-gray-200 rounded-full">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <input type="text" placeholder="Type a message" class="flex-1 bg-transparent px-4 focus:outline-none">
+                        <button class="p-2 hover:bg-gray-200 rounded-full">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="customer-card">
-        <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
-        <div class="space-y-4">
-            <div class="p-3 bg-blue-50 rounded-lg">
-                <div class="text-sm text-blue-800">Policy Renewal</div>
-                <div class="text-xs text-gray-500 mt-1">2024-01-15</div>
+    <!-- Customer Info Float Card (Hidden by default) -->
+    <div id="customer-info-card" class="hidden float-card absolute bg-white rounded-lg shadow-xl p-6 w-[480px]">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg font-semibold">Customer Details</h3>
+            <button class="text-gray-500 hover:text-gray-700" onclick="toggleCustomerCard()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Basic Info Section -->
+        <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-500 mb-3">Basic Information</h4>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Name</span>
+                    <button class="text-blue-500 hover:text-blue-600 flex items-center" onclick="showEditModal('name', 'John Doe')">
+                        <span>John Doe</span>
+                        <i class="fas fa-pen ml-2 text-xs"></i>
+                    </button>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Age</span>
+                    <button class="text-blue-500 hover:text-blue-600 flex items-center" onclick="showEditModal('age', '35')">
+                        <span>35</span>
+                        <i class="fas fa-pen ml-2 text-xs"></i>
+                    </button>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Address</span>
+                    <button class="text-blue-500 hover:text-blue-600 flex items-center" onclick="showEditModal('address', '123 Sydney St')">
+                        <span>123 Sydney St</span>
+                        <i class="fas fa-pen ml-2 text-xs"></i>
+                    </button>
+                </div>
             </div>
-            <div class="p-3 bg-green-50 rounded-lg">
-                <div class="text-sm text-green-800">Payment Received</div>
-                <div class="text-xs text-gray-500 mt-1">2024-01-10</div>
+        </div>
+
+        <!-- Membership Level -->
+        <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-500 mb-3">Membership Level</h4>
+            <button class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg text-sm w-full text-left flex items-center justify-between" onclick="showMembershipInfo()">
+                <span class="flex items-center">
+                    <i class="fas fa-crown mr-2"></i>
+                    Gold Member
+                </span>
+                <i class="fas fa-chevron-right text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Programs -->
+        <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-500 mb-3">Enrolled Programs</h4>
+            <div class="space-y-2">
+                <button class="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg text-sm w-full text-left flex items-center justify-between" onclick="showProgramInfo('carefree')">
+                    <span>Carefree</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+                <button class="bg-green-100 text-green-800 px-4 py-2 rounded-lg text-sm w-full text-left flex items-center justify-between" onclick="showProgramInfo('caresupport')">
+                    <span>Caresupport</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
             </div>
-            <div class="p-3 bg-yellow-50 rounded-lg">
-                <div class="text-sm text-yellow-800">Support Ticket Created</div>
-                <div class="text-xs text-gray-500 mt-1">2024-01-05</div>
+        </div>
+
+        <!-- Contact History -->
+        <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-500 mb-3">History Contact Record</h4>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-sm text-gray-600 mb-2">Last contact:</div>
+                <button class="text-blue-500 hover:text-blue-600 font-medium" onclick="openChat('Sarah Smith', '12345678')">Sarah Smith</button>
+                <div class="text-sm text-gray-600 mt-1">Updated insurance coverage details</div>
+            </div>
+        </div>
+
+        <!-- AI Knowledge Graph -->
+        <div>
+            <h4 class="text-sm font-medium text-gray-500 mb-3">AI Health Insights</h4>
+            <button class="w-full bg-gray-50 p-4 rounded-lg text-left hover:bg-gray-100 flex items-center justify-between" onclick="showAIInsights()">
+                <span class="flex items-center">
+                    <i class="fas fa-brain mr-2 text-purple-500"></i>
+                    View Health Pattern Analysis
+                </span>
+                <i class="fas fa-chevron-right text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-[400px]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Edit <span id="edit-field-name"></span></h3>
+                <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <input type="text" id="edit-input" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex justify-end">
+                <button onclick="closeEditModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 mr-2">Cancel</button>
+                <button onclick="saveEdit()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
             </div>
         </div>
     </div>
+
+    <!-- Membership Info Modal -->
+    <div id="membership-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-[400px]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Membership Details</h3>
+                <button onclick="closeMembershipModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <i class="fas fa-crown text-yellow-500 mr-3"></i>
+                    <div>
+                        <div class="font-medium">Gold Member</div>
+                        <div class="text-sm text-gray-600">Since January 1, 2020</div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <div class="font-medium mb-2">Benefits include:</div>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Priority customer service</li>
+                        <li>Enhanced coverage limits</li>
+                        <li>Exclusive health programs</li>
+                        <li>24/7 support access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Insights Modal -->
+    <div id="ai-insights-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-[600px]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Health Pattern Analysis</h3>
+                <button onclick="closeAIInsightsModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <canvas id="healthChart" width="400" height="400"></canvas>
+            </div>
+            <div class="text-sm text-gray-600">
+                * This analysis is based on aggregated data and does not reflect specific medical conditions
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini Chat Window -->
+    <div id="mini-chat-window" class="hidden fixed bg-white rounded-lg shadow-xl overflow-hidden" style="width: 640px; height: 800px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <!-- Mini Chat Header -->
+        <div class="p-4 border-b flex items-center justify-between bg-[#f5f5f7]">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 text-sm">SS</div>
+                <div class="ml-3">
+                    <div class="text-base font-medium">Sarah Smith</div>
+                    <div class="text-sm text-gray-500">Staff ID: ST007</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button class="p-2 hover:bg-gray-200 rounded-lg text-gray-500" onclick="minimizeMiniChat()">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="p-2 hover:bg-gray-200 rounded-lg text-gray-500" onclick="closeMiniChat()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mini Chat Messages -->
+        <div id="mini-chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4" style="height: calc(100% - 180px);">
+            <!-- Messages will be added here -->
+        </div>
+
+        <!-- Mini Chat Input -->
+        <div class="p-4 border-t">
+            <div class="flex items-center bg-[#f5f5f7] rounded-lg p-3">
+                <textarea id="mini-chat-input" class="flex-1 bg-transparent px-3 py-2 focus:outline-none resize-none text-sm" rows="4" style="min-height: 100px;"></textarea>
+                <button class="p-3 hover:bg-gray-200 rounded-full ml-2 flex items-center justify-center" onclick="sendMiniChatMessage()" style="width: 48px; height: 48px;">
+                    <i class="fas fa-paper-plane text-blue-500 text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js for pie chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Update clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Customer info card toggle
+        let customerCardVisible = false;
+        const customerCard = document.getElementById('customer-info-card');
+        const customerTrigger = document.getElementById('customer-id-trigger');
+
+        function toggleCustomerCard() {
+            customerCardVisible = !customerCardVisible;
+            customerCard.style.display = customerCardVisible ? 'block' : 'none';
+            
+            if (customerCardVisible) {
+                const triggerRect = customerTrigger.getBoundingClientRect();
+                customerCard.style.top = `${triggerRect.top}px`;
+                customerCard.style.left = `${triggerRect.right + 10}px`;
+            }
+        }
+
+        customerTrigger.addEventListener('click', toggleCustomerCard);
+
+        // Edit modal functionality
+        const editModal = document.getElementById('edit-modal');
+        const editFieldName = document.getElementById('edit-field-name');
+        const editInput = document.getElementById('edit-input');
+        let currentEditField = '';
+
+        function showEditModal(field, currentValue) {
+            editModal.classList.remove('hidden');
+            editFieldName.textContent = field;
+            editInput.value = currentValue;
+            currentEditField = field;
+        }
+
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+        }
+
+        function saveEdit() {
+            // Here you would typically save the changes to a backend
+            alert(`Saving ${currentEditField}: ${editInput.value}`);
+            closeEditModal();
+        }
+
+        // Membership modal functionality
+        const membershipModal = document.getElementById('membership-modal');
+
+        function showMembershipInfo() {
+            membershipModal.classList.remove('hidden');
+        }
+
+        function closeMembershipModal() {
+            membershipModal.classList.add('hidden');
+        }
+
+        // Program info functionality
+        function showProgramInfo(program) {
+            const startDates = {
+                carefree: 'March 15, 2023',
+                caresupport: 'April 1, 2023'
+            };
+            alert(`${program} program started: ${startDates[program]}`);
+        }
+
+        // Chat functionality
+        function openChat(employee, customerId) {
+            openMiniChat(employee, customerId);
+        }
+
+        // AI Insights functionality
+        const aiInsightsModal = document.getElementById('ai-insights-modal');
+        let healthChart = null;
+
+        function showAIInsights() {
+            aiInsightsModal.classList.remove('hidden');
+            if (!healthChart) {
+                const ctx = document.getElementById('healthChart').getContext('2d');
+                healthChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Preventive Care', 'Chronic Care', 'Acute Care', 'Wellness'],
+                        datasets: [{
+                            data: [30, 25, 15, 30],
+                            backgroundColor: [
+                                '#60A5FA',
+                                '#34D399',
+                                '#F87171',
+                                '#A78BFA'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Health Care Pattern Distribution'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function closeAIInsightsModal() {
+            aiInsightsModal.classList.add('hidden');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target === editModal) {
+                closeEditModal();
+            }
+            if (event.target === membershipModal) {
+                closeMembershipModal();
+            }
+            if (event.target === aiInsightsModal) {
+                closeAIInsightsModal();
+            }
+        }
+
+        // Mini Chat Window functionality
+        const miniChatWindow = document.getElementById('mini-chat-window');
+        const miniChatInput = document.getElementById('mini-chat-input');
+        const miniChatMessages = document.getElementById('mini-chat-messages');
+        let miniChatMinimized = false;
+        let originalHeight;
+        let originalTop;
+        let originalTransform;
+
+        function openMiniChat(employee, customerId) {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const formattedTime = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const message = `ID${customerId}'s inquiry. You previously assisted them on March 15, 2023 at 2:30 PM. They have further questions about their previous service. Are you available to handle this case?`;
+            
+            miniChatWindow.style.display = 'block';
+            miniChatInput.value = message;
+
+            // Store original dimensions
+            originalHeight = miniChatWindow.style.height;
+            originalTop = miniChatWindow.style.top;
+            originalTransform = miniChatWindow.style.transform;
+
+            // Focus and select the text for easy editing
+            miniChatInput.focus();
+            miniChatInput.select();
+        }
+
+        function minimizeMiniChat() {
+            if (!miniChatMinimized) {
+                miniChatWindow.style.height = '60px';
+                miniChatWindow.style.top = 'auto';
+                miniChatWindow.style.bottom = '0';
+                miniChatWindow.style.transform = 'translateX(-50%)';
+                miniChatMinimized = true;
+            } else {
+                miniChatWindow.style.height = originalHeight;
+                miniChatWindow.style.top = originalTop;
+                miniChatWindow.style.transform = originalTransform;
+                miniChatWindow.style.bottom = 'auto';
+                miniChatMinimized = false;
+            }
+        }
+
+        function closeMiniChat() {
+            miniChatWindow.style.display = 'none';
+            miniChatMinimized = false;
+            miniChatWindow.style.height = originalHeight;
+            miniChatWindow.style.top = originalTop;
+            miniChatWindow.style.transform = originalTransform;
+            miniChatWindow.style.bottom = 'auto';
+            // Clear messages when closing
+            miniChatMessages.innerHTML = '';
+        }
+
+        function sendMiniChatMessage() {
+            const messageText = miniChatInput.value.trim();
+            if (messageText) {
+                // Create message elements
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message message-sent bg-blue-500 text-white self-end rounded-lg px-4 py-2 max-w-[80%]';
+                messageDiv.textContent = messageText;
+
+                // Add message to chat
+                miniChatMessages.appendChild(messageDiv);
+
+                // Clear input
+                miniChatInput.value = '';
+
+                // Scroll to bottom
+                miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
+
+                // Add system response after a short delay
+                setTimeout(() => {
+                    const responseDiv = document.createElement('div');
+                    responseDiv.className = 'message message-received bg-gray-100 text-gray-800 self-start rounded-lg px-4 py-2 max-w-[80%]';
+                    responseDiv.textContent = 'I will check the case and get back to you shortly.';
+                    miniChatMessages.appendChild(responseDiv);
+                    miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
+                }, 1000);
+            }
+        }
+
+        // Add keyboard shortcut for sending message
+        miniChatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMiniChatMessage();
+            }
+        });
+    </script>
 </body>
 </html> 

@@ -3,263 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medibank Customer Service Portal</title>
+    <title>Medibank Customer Support System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles */
-        html, body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f5f5f7;
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* MacOS-style window controls */
-        .window-controls span {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-        
-        .window-close { background-color: #ff5f56; }
-        .window-minimize { background-color: #ffbd2e; }
-        .window-maximize { background-color: #27c93f; }
-
-        /* Navigation styles */
-        .nav-item {
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(0, 122, 255, 0.1);
-            border-color: #007AFF;
-        }
-
-        .nav-item.active {
-            background-color: #007AFF;
-            color: white;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        /* Main container */
-        .main-container {
-            width: 100%;
-            height: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-
-        .window-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* Preview grid */
-        .preview-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .preview-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease;
-            cursor: pointer;
-            position: relative;
-            height: 450px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            overflow-x: auto;
-        }
-
-        .preview-card:hover {
-            transform: translateY(-4px);
-        }
-
         .preview-frame {
-            width: 200%;
-            height: 200%;
-            border: none;
             transform: scale(0.5);
             transform-origin: 0 0;
+            width: 200%;
+            height: 200%;
             pointer-events: none;
         }
-
-        .preview-overlay {
+        .card-container {
+            width: 400px;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+        .card-overlay {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.02);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.1);
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.3s;
         }
-
-        .preview-card:hover .preview-overlay {
+        .card-container:hover .card-overlay {
             opacity: 1;
-        }
-
-        .preview-title {
-            color: #007AFF;
-            font-weight: 500;
-            font-size: 1.1em;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Full page view */
-        .full-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            z-index: 1000;
-            display: none;
-        }
-
-        .full-page iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .back-button:hover {
-            background: #f5f5f7;
         }
     </style>
 </head>
-<body>
-    <div class="main-container">
-        <div class="window-container">
-            <!-- Window Controls -->
-            <div class="bg-[#f5f5f7] px-4 py-2 flex items-center">
-                <div class="window-controls">
-                    <span class="window-close"></span>
-                    <span class="window-minimize"></span>
-                    <span class="window-maximize"></span>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Medibank Customer Support System</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            <!-- Customer ID Details Card -->
+            <a href="Customer_ID_AI_Details.html" class="block">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 card-container">
+                    <iframe src="Customer_ID_AI_Details.html" class="preview-frame border-none"></iframe>
+                    <div class="card-overlay flex items-center justify-center">
+                        <span class="bg-white px-4 py-2 rounded-lg text-gray-800 font-semibold">Customer ID Details</span>
+                    </div>
                 </div>
-                <div class="ml-6 text-sm font-medium">Medibank Customer Service Portal</div>
-            </div>
+            </a>
 
-            <!-- Preview Grid -->
-            <div class="preview-grid">
-                <div class="preview-card" onclick="switchPage('Customer_ID_AI_Details.html')">
-                    <iframe class="preview-frame" src="Customer_ID_AI_Details.html"></iframe>
-                    <div class="preview-overlay">
-                        <div class="preview-title">Customer Details</div>
+            <!-- AI Assistant Chat Card -->
+            <a href="CustomerSupport_Chat_AIAssistant.html" class="block">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 card-container">
+                    <iframe src="CustomerSupport_Chat_AIAssistant.html" class="preview-frame border-none"></iframe>
+                    <div class="card-overlay flex items-center justify-center">
+                        <span class="bg-white px-4 py-2 rounded-lg text-gray-800 font-semibold">AI Assistant Chat</span>
                     </div>
                 </div>
-                <div class="preview-card" onclick="switchPage('CustomerSupport_Chat_AIAssistant.html')">
-                    <iframe class="preview-frame" src="CustomerSupport_Chat_AIAssistant.html"></iframe>
-                    <div class="preview-overlay">
-                        <div class="preview-title">AI Assistant Chat</div>
+            </a>
+
+            <!-- Group Chat Card -->
+            <a href="CustomerSupport_groupchat.html" class="block">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 card-container">
+                    <iframe src="CustomerSupport_groupchat.html" class="preview-frame border-none"></iframe>
+                    <div class="card-overlay flex items-center justify-center">
+                        <span class="bg-white px-4 py-2 rounded-lg text-gray-800 font-semibold">Group Chat</span>
                     </div>
                 </div>
-                <div class="preview-card" onclick="switchPage('CustomerSupport_groupchat.html')">
-                    <iframe class="preview-frame" src="CustomerSupport_groupchat.html"></iframe>
-                    <div class="preview-overlay">
-                        <div class="preview-title">Team Group Chat</div>
-                    </div>
-                </div>
-            </div>
+            </a>
         </div>
     </div>
-
-    <!-- Full page view -->
-    <div class="full-page">
-        <button class="back-button" onclick="showPreview()">
-            <i class="fas fa-arrow-left mr-2"></i>Back
-        </button>
-        <iframe id="fullPageFrame"></iframe>
-    </div>
-
-    <script>
-        function switchPage(page) {
-            // Show full page view
-            document.querySelector('.full-page').style.display = 'block';
-            document.querySelector('.back-button').style.display = 'flex';
-            document.querySelector('#fullPageFrame').src = page;
-        }
-
-        function showPreview() {
-            document.querySelector('.full-page').style.display = 'none';
-            document.querySelector('.back-button').style.display = 'none';
-            document.querySelector('#fullPageFrame').src = '';
-        }
-
-        function getPageTitle(page) {
-            switch(page) {
-                case 'Customer_ID_AI_Details.html':
-                    return 'Customer Details';
-                case 'CustomerSupport_Chat_AIAssistant.html':
-                    return 'AI Assistant Chat';
-                case 'CustomerSupport_groupchat.html':
-                    return 'Team Group Chat';
-                default:
-                    return '';
-            }
-        }
-    </script>
 </body>
 </html> 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant Chat - Medibank</title>
+    <title>Medibank Customer Service Portal</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -11,137 +11,560 @@
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Custom styles */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f5f5f7;
-            margin: 0;
-            padding: 20px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
-        .chat-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        
+        /* MacOS-style window controls */
+        .window-controls span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
         }
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
+        
+        .window-close { background-color: #ff5f56; }
+        .window-minimize { background-color: #ffbd2e; }
+        .window-maximize { background-color: #27c93f; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        /* Chat message styles */
         .message {
-            margin-bottom: 16px;
-            max-width: 70%;
-        }
-        .message-user {
-            margin-left: auto;
-            background: #007AFF;
-            color: white;
-            border-radius: 16px 16px 4px 16px;
-            padding: 12px 16px;
-        }
-        .message-ai {
-            margin-right: auto;
-            background: #f0f0f0;
-            border-radius: 16px 16px 16px 4px;
-            padding: 12px 16px;
-        }
-        .chat-input {
-            padding: 20px;
-            border-top: 1px solid #e5e5e5;
-            background: white;
-        }
-        .input-container {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .input-field {
-            flex: 1;
+            max-width: 80%;
+            margin: 8px;
             padding: 12px;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            outline: none;
-            font-size: 14px;
+            border-radius: 12px;
         }
-        .send-button {
-            background: #007AFF;
+
+        .message-received {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+        }
+
+        .message-sent {
+            background-color: #007AFF;
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            align-self: flex-end;
         }
-        .send-button:hover {
-            background: #0056b3;
+
+        /* AI Assistant Card */
+        .ai-assistant {
+            display: none;
+            background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.95) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+                        0 2px 8px rgba(0, 0, 0, 0.05);
+            width: 420px;
+            height: 500px;
+            position: absolute;
+            right: 24px;
+            top: 80px;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .ai-assistant.show {
+            display: block;
+            animation: floatIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes floatIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .ai-header {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .ai-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .ai-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .ai-button {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            transition: all 0.3s ease;
+        }
+
+        .ai-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .typing-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80% { content: '...'; }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
     </style>
 </head>
-<body>
-    <div class="chat-container">
-        <div class="chat-messages">
-            <div class="message message-ai">
-                Hello! I'm your AI assistant. How can I help you today?
+<body class="h-screen flex flex-col">
+    <!-- MacOS Status Bar -->
+    <div class="bg-[#1a1a1a] text-white px-4 py-1 flex justify-between items-center text-sm">
+        <div class="flex items-center space-x-4">
+            <i class="fab fa-apple"></i>
+            <span>Medibank Service</span>
+            <span>File</span>
+            <span>Edit</span>
+            <span>View</span>
+            <span>Help</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
+            <span id="clock">12:00 PM</span>
+        </div>
+    </div>
+
+    <!-- App Window -->
+    <div class="flex-1 bg-white shadow-lg m-2 rounded-lg overflow-hidden flex flex-col">
+        <!-- Window Controls -->
+        <div class="bg-[#f5f5f7] px-4 py-2 flex items-center">
+            <div class="window-controls">
+                <span class="window-close"></span>
+                <span class="window-minimize"></span>
+                <span class="window-maximize"></span>
             </div>
-            <div class="message message-user">
-                I need help with my insurance claim.
+            <div class="ml-6 text-sm font-medium">Customer Service Portal - Medibank</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex">
+            <!-- Left Sidebar - Navigation -->
+            <div class="w-16 bg-[#f5f5f7] flex flex-col items-center py-4 border-r">
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white mb-4">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-comments text-blue-500"></i>
+                </div>
+                <div class="w-10 h-10 hover:bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="w-10 h-10 hover:bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
             </div>
-            <div class="message message-ai">
-                I'll be happy to help you with your insurance claim. Could you please provide your claim number or tell me more about the type of claim you'd like to submit?
+
+            <!-- Chat List -->
+            <div class="w-72 border-r">
+                <div class="p-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Search conversations" class="w-full px-4 py-2 bg-[#f5f5f7] rounded-lg pl-10">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="overflow-y-auto h-[calc(100vh-180px)]">
+                    <!-- Active chat with unread message -->
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer relative bg-gray-100">
+                        <div class="flex items-center">
+                            <div class="relative">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">JS</div>
+                                <div id="unread-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-medium shadow-sm transition-opacity duration-300">1</div>
+                            </div>
+                            <div class="ml-3">
+                                <div class="font-medium">John Smith</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901234</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Other chat items -->
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-500">ES</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Emma Smith</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901235</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-500">WB</div>
+                            <div class="ml-3">
+                                <div class="font-medium">William Brown</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901236</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-500">OD</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Olivia Davis</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901237</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-500">JW</div>
+                            <div class="ml-3">
+                                <div class="font-medium">James Wilson</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901238</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-500">ST</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Sophia Taylor</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901239</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500">LM</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Liam Moore</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901240</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-500">AJ</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Ava Johnson</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901241</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">NH</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Noah Harris</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901242</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hover:bg-gray-100 p-4 cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-500">IA</div>
+                            <div class="ml-3">
+                                <div class="font-medium">Isabella Anderson</div>
+                                <div class="text-sm text-gray-500">Customer ID: 78901243</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="flex-1 flex flex-col bg-white">
+                <!-- Chat Header -->
+                <div class="p-4 border-b flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">JS</div>
+                        <div class="ml-3">
+                            <div class="font-medium">John Smith</div>
+                            <div class="text-sm text-gray-500">Customer ID: 78901234</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-phone text-gray-600"></i>
+                        </button>
+                        <button class="p-2 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-video text-gray-600"></i>
+                        </button>
+                        <button class="p-2 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-ellipsis-h text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="flex-1 overflow-y-auto p-6 space-y-4" id="chat-messages">
+                    <!-- Initial message from customer -->
+                    <div class="flex justify-start">
+                        <div class="message message-received">
+                            Hi, I need help understanding my policy coverage. Can you explain what's included in my health insurance plan?
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="p-4 border-t">
+                    <div class="bg-[#f5f5f7] rounded-lg p-3">
+                        <div class="flex items-center space-x-3">
+                            <button class="p-2 hover:bg-gray-200 rounded-full">
+                                <i class="fas fa-paperclip text-gray-600"></i>
+                            </button>
+                            <input type="text" 
+                                   id="message-input"
+                                   class="flex-1 bg-transparent border-none focus:outline-none"
+                                   placeholder="Type your message here..."
+                                   onclick="showAIAssistant()">
+                            <button class="p-2 hover:bg-gray-200 rounded-full">
+                                <i class="far fa-smile text-gray-600"></i>
+                            </button>
+                            <button id="send-button" 
+                                    class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600"
+                                    onclick="sendMessage()">
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="chat-input">
-            <div class="input-container">
-                <input type="text" class="input-field" placeholder="Type your message here...">
-                <button class="send-button">
-                    <i class="fas fa-paper-plane"></i>
+
+        <!-- AI Assistant Card -->
+        <div id="ai-assistant" class="ai-assistant">
+            <div class="ai-header p-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-lg">AI Assistant</div>
+                        <div class="text-sm text-white/80">Your personal helper</div>
+                    </div>
+                </div>
+                <button onclick="hideAIAssistant()" class="text-white/80 hover:text-white">
+                    <i class="fas fa-times"></i>
                 </button>
+            </div>
+            
+            <!-- AI Chat Area -->
+            <div id="ai-chat-area" class="h-[350px] overflow-y-auto p-4 space-y-4">
+                <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
+                    <div class="font-semibold text-lg text-indigo-900 mb-2">
+                        Welcome Aria!
+                    </div>
+                    <div class="text-indigo-700">
+                        I'm here to assist you with customer inquiries today. How can I help?
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Input Area -->
+            <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white/80 backdrop-blur-sm rounded-b-lg">
+                <div class="flex items-center space-x-2">
+                    <input type="text" 
+                           id="ai-input"
+                           class="ai-input flex-1 px-4 py-2.5 rounded-xl"
+                           placeholder="Ask AI for help...">
+                    <button onclick="sendToAI()"
+                            class="ai-button p-2.5 rounded-xl text-white min-w-[44px] flex items-center justify-center">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const inputField = document.querySelector('.input-field');
-        const sendButton = document.querySelector('.send-button');
-        const chatMessages = document.querySelector('.chat-messages');
+        // Update clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        function sendMessage() {
-            const message = inputField.value.trim();
-            if (message) {
-                // Add user message
-                const userMessage = document.createElement('div');
-                userMessage.className = 'message message-user';
-                userMessage.textContent = message;
-                chatMessages.appendChild(userMessage);
-
-                // Clear input
-                inputField.value = '';
-
-                // Scroll to bottom
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                // Simulate AI response
+        // Show/Hide AI Assistant
+        function showAIAssistant() {
+            document.getElementById('ai-assistant').classList.add('show');
+            // Hide unread badge when input is focused
+            const unreadBadge = document.getElementById('unread-badge');
+            if (unreadBadge) {
+                unreadBadge.style.opacity = '0';
+                // Remove the badge from DOM after animation
                 setTimeout(() => {
-                    const aiMessage = document.createElement('div');
-                    aiMessage.className = 'message message-ai';
-                    aiMessage.textContent = "I understand you need assistance. Let me help you with that.";
-                    chatMessages.appendChild(aiMessage);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 1000);
+                    unreadBadge.remove();
+                }, 300);
             }
         }
 
-        sendButton.addEventListener('click', sendMessage);
-        inputField.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
+        function hideAIAssistant() {
+            document.getElementById('ai-assistant').classList.remove('show');
+        }
+
+        // Chat functionality
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const aiInput = document.getElementById('ai-input');
+        const aiChatArea = document.getElementById('ai-chat-area');
+
+        function addMessage(content, isUser = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            
+            const message = document.createElement('div');
+            message.className = `message ${isUser ? 'message-sent' : 'message-received'}`;
+            message.textContent = content;
+            
+            messageDiv.appendChild(message);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content) {
+                messageInput.classList.add('shake');
+                setTimeout(() => messageInput.classList.remove('shake'), 500);
+                return;
             }
+            
+            addMessage(content, true);
+            messageInput.value = '';
+        }
+
+        function sendToAI() {
+            const content = aiInput.value.trim();
+            if (!content) {
+                aiInput.classList.add('shake');
+                setTimeout(() => aiInput.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Add user message to AI chat
+            const userDiv = document.createElement('div');
+            userDiv.className = 'bg-indigo-50 p-3 rounded-xl border border-indigo-100';
+            userDiv.textContent = content;
+            aiChatArea.appendChild(userDiv);
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'bg-gray-50 p-3 rounded-xl border border-gray-100 flex items-center space-x-2';
+            typingDiv.innerHTML = `
+                <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-robot text-indigo-500 text-sm"></i>
+                </div>
+                <div class="text-gray-500 typing-dots">Thinking</div>
+            `;
+            aiChatArea.appendChild(typingDiv);
+
+            // Clear input
+            aiInput.value = '';
+            aiChatArea.scrollTop = aiChatArea.scrollHeight;
+
+            // Simulate AI response after 2 seconds
+            setTimeout(() => {
+                // Remove typing indicator
+                typingDiv.remove();
+
+                // Add AI response
+                const aiResponse = document.createElement('div');
+                aiResponse.className = 'bg-white p-4 rounded-xl border border-gray-200 space-y-3';
+                aiResponse.innerHTML = `
+                    <div class="flex items-center space-x-2 text-indigo-600">
+                        <i class="fas fa-lightbulb"></i>
+                        <span class="font-medium">Suggested Response</span>
+                    </div>
+                    <div class="text-gray-700">
+                        Thank you for reaching out. I understand your concern about the policy coverage. Let me help you with that. Your current policy (MB-2024-0123) includes comprehensive health coverage with dental and optical benefits.
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        <div class="text-sm text-gray-500">Related documents:</div>
+                        <div class="flex flex-col space-y-1">
+                            <a href="#" class="flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 text-sm">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Health_Insurance_Coverage_2024.pdf</span>
+                            </a>
+                            <a href="#" class="flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 text-sm">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Dental_Optical_Benefits_Guide.pdf</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 pt-2">
+                        <button onclick="reportError(this)" 
+                                class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center space-x-1">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Report Error</span>
+                        </button>
+                        <button onclick="applyResponse(this)" 
+                                class="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors flex items-center space-x-1">
+                            <i class="fas fa-check"></i>
+                            <span>Apply</span>
+                        </button>
+                    </div>
+                `;
+                aiChatArea.appendChild(aiResponse);
+                aiChatArea.scrollTop = aiChatArea.scrollHeight;
+            }, 2000);
+        }
+
+        function reportError(button) {
+            const responseDiv = button.parentElement.parentElement;
+            responseDiv.innerHTML = '<div class="text-gray-600">Thank you for your feedback. I will improve my responses in the future.</div>';
+        }
+
+        function applyResponse(button) {
+            // 获取回答内容的div（第二个div，包含主要回答内容）
+            const response = button.parentElement.parentElement.querySelector('.text-gray-700').textContent;
+            messageInput.value = response;
+            messageInput.focus();
+        }
+
+        // Event Listeners
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendToAI();
         });
     </script>
 </body>
