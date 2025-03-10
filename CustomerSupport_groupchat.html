@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Chat - Medibank</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+        .team-members {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .team-member {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .message {
+            margin-bottom: 16px;
+            max-width: 70%;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            flex-shrink: 0;
+        }
+        .message-content {
+            background: #f0f0f0;
+            padding: 12px 16px;
+            border-radius: 16px 16px 16px 4px;
+            position: relative;
+        }
+        .message-sender {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .message-time {
+            font-size: 10px;
+            color: #999;
+            margin-top: 4px;
+        }
+        .message.sent {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+        .message.sent .message-content {
+            background: #007AFF;
+            color: white;
+            border-radius: 16px 16px 4px 16px;
+        }
+        .message.sent .message-sender,
+        .message.sent .message-time {
+            text-align: right;
+        }
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #e5e5e5;
+            background: white;
+        }
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .input-field {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+        .send-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .send-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-semibold">Customer Support Team</h1>
+                <div class="team-members">
+                    <div class="team-member">JD</div>
+                    <div class="team-member">AS</div>
+                    <div class="team-member">TW</div>
+                    <div class="team-member" style="background: #007AFF; color: white;">+2</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-phone"></i>
+                </button>
+                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chat-messages">
+            <div class="message">
+                <div class="message-avatar">JD</div>
+                <div>
+                    <div class="message-sender">John Doe</div>
+                    <div class="message-content">
+                        Hi team, we have a new customer case that needs immediate attention.
+                        <div class="message-time">10:30 AM</div>
+                    </div>
+                </div>
+            </div>
+            <div class="message">
+                <div class="message-avatar">AS</div>
+                <div>
+                    <div class="message-sender">Alice Smith</div>
+                    <div class="message-content">
+                        What's the case about? I can help.
+                        <div class="message-time">10:31 AM</div>
+                    </div>
+                </div>
+            </div>
+            <div class="message sent">
+                <div class="message-avatar">ME</div>
+                <div>
+                    <div class="message-sender">Me</div>
+                    <div class="message-content">
+                        I'll check the customer's history and get back to you.
+                        <div class="message-time">10:32 AM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <div class="input-container">
+                <input type="text" class="input-field" placeholder="Type your message here...">
+                <button class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputField = document.querySelector('.input-field');
+        const sendButton = document.querySelector('.send-button');
+        const chatMessages = document.querySelector('.chat-messages');
+
+        function sendMessage() {
+            const message = inputField.value.trim();
+            if (message) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                const messageHTML = `
+                    <div class="message sent">
+                        <div class="message-avatar">ME</div>
+                        <div>
+                            <div class="message-sender">Me</div>
+                            <div class="message-content">
+                                ${message}
+                                <div class="message-time">${timeString}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                chatMessages.insertAdjacentHTML('beforeend', messageHTML);
+                inputField.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Simulate team member response
+                setTimeout(() => {
+                    const teamMembers = ['JD', 'AS', 'TW'];
+                    const teamNames = ['John Doe', 'Alice Smith', 'Tom Wilson'];
+                    const randomIndex = Math.floor(Math.random() * teamMembers.length);
+                    
+                    const responseHTML = `
+                        <div class="message">
+                            <div class="message-avatar">${teamMembers[randomIndex]}</div>
+                            <div>
+                                <div class="message-sender">${teamNames[randomIndex]}</div>
+                                <div class="message-content">
+                                    Thanks for the update. I'll follow up on that.
+                                    <div class="message-time">${timeString}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    chatMessages.insertAdjacentHTML('beforeend', responseHTML);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 
